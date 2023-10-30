@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>網頁聊天室</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+
+        #chatBox {
+            width: 400px;
+            height: 300px;
+            border: 1px solid #ccc;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+        }
+
+        #messageInput {
+            width: 300px;
+            padding: 5px;
+            margin-right: 5px;
+        }
+
+        #fileInput {
+            margin-right: 5px;
+        }
+
+        #sendButton {
+            padding: 5px 10px;
+        }
+
+        #usernameInput {
+            margin-bottom: 10px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>網頁聊天室</h1>
+    <input type="text" id="usernameInput" placeholder="輸入你的使用者名稱">
+    <div id="chatBox"></div>
+    <input type="file" id="fileInput" accept="image/*,video/*">
+    <input type="text" id="messageInput" placeholder="輸入訊息">
+    <button id="sendButton">發送</button>
+
+    <script>
+        let username;
+
+        function setUsername() {
+            const usernameInput = document.getElementById("usernameInput");
+            username = usernameInput.value.trim();
+
+            if (username !== "") {
+                // 隱藏使用者名稱輸入框
+                usernameInput.style.display = "none";
+
+                // 顯示聊天介面
+                const chatElements = document.querySelectorAll("#chatBox, #messageInput, #fileInput, #sendButton");
+                chatElements.forEach(element => {
+                    element.style.display = "block";
+                });
+
+                // 清空輸入框
+                usernameInput.value = "";
+            }
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById("messageInput");
+            const message = messageInput.value.trim();
+
+            if (message !== "" || fileInput.files.length > 0) {
+                const messageElement = document.createElement("div");
+
+                // 顯示使用者名稱
+                const usernameElement = document.createElement("strong");
+                usernameElement.textContent = username + ": ";
+                messageElement.appendChild(usernameElement);
+
+                // 顯示訊息
+                messageElement.appendChild(document.createTextNode(message));
+
+                chatBox.appendChild(messageElement);
+
+                // 上傳圖片或影片
+                if (fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    const reader = new FileReader();
+
+                    reader.onload = function(event) {
+                        const mediaElement = document.createElement(file.type.startsWith('image') ? "img" : "video");
+                        mediaElement.src = event.target.result;
+                        mediaElement.width = 300;
+                        mediaElement.controls = true;
+                        messageElement.appendChild(mediaElement);
+                    }
+
+                    reader.readAsDataURL(file);
+                }
+
+                // 清空輸入框和檔案選擇器
+                messageInput.value = "";
+                fileInput.value = "";
+
+                // 滾動到底部
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        }
+
+        const usernameInput = document.getElementById("usernameInput");
+        usernameInput.addEventListener("keyup", function(event) {
+            if (event.key === "Enter") {
+                setUsername();
+            }
+        });
+
+        const messageInput = document.getElementById("messageInput");
+        messageInput.addEventListener("keyup", function(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        });
+
+        const fileInput = document.getElementById("fileInput");
+
+        const sendButton = document.getElementById("sendButton");
+        sendButton.addEventListener("click", sendMessage);
+    </script>
+</body>
+</html>
